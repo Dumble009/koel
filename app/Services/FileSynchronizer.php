@@ -197,7 +197,7 @@ class FileSynchronizer
             $this->generateAlbumCover($album, array_get($info, 'cover'));
         }
 
-        $data = array_except($info, ['artist', 'album', 'cover', 'compilation']);
+        $data = array_except($info, ['artist', 'album', 'albumartist', 'cover', 'compilation']);
         $data['album_id'] = $album->id;
         $data['artist_id'] = $artist->id;
         $this->song = Song::updateOrCreate(['id' => $this->fileHash], $data);
