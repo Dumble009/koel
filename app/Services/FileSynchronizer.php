@@ -116,13 +116,16 @@ class FileSynchronizer
         ];
 
         $comments = array_get($info, 'comments_html');
-
         if (!$comments) {
             return $props;
         }
 
         $this->gatherPropsFromTags($info, $comments, $props);
         $props['compilation'] = (bool) $props['compilation'] || $this->isCompilation($props);
+
+        // compilation is always false.
+        // because album's artist is always specified.
+        $props['compilation'] = false;
 
         return $props;
     }
@@ -171,28 +174,30 @@ class FileSynchronizer
 
             // If the "artist" tag is specified, use it.
             // Otherwise, re-use the existing model value.
-            $artist = isset($info['artist']) ? Artist::getOrCreate($info['artist']) : $this->song->album->artist;
+            $artist = isset($info['artist']) ? Artist::getOrCreate($info['artist']) : $this->song->artist;
+            $albumArtist = isset($info['albumartist']) ? Artist::getOrCreate(($info['albumartist'])) : $this->song->album->artist;
 
             // If the "album" tag is specified, use it.
             // Otherwise, re-use the existing model value.
             if (isset($info['album'])) {
                 $album = $changeCompilationAlbumOnly
                     ? $this->song->album
-                    : Album::getOrCreate($artist, $info['album'], array_get($info, 'compilation'));
+                    : Album::getOrCreate($albumArtist, $info['album'], array_get($info, 'compilation'));
             } else {
                 $album = $this->song->album;
             }
         } else {
             // The file is newly added.
             $artist = Artist::getOrCreate($info['artist']);
-            $album = Album::getOrCreate($artist, $info['album'], array_get($info, 'compilation'));
+            $albumArtist = Artist::getOrCreate($info['albumartist']);
+            $album = Album::getOrCreate($albumArtist, $info['album'], array_get($info, 'compilation'));
         }
 
         if (!$album->has_cover) {
             $this->generateAlbumCover($album, array_get($info, 'cover'));
         }
 
-        $data = array_except($info, ['artist', 'albumartist', 'album', 'cover', 'compilation']);
+        $data = array_except($info, ['artist', 'album', 'cover', 'compilation']);
         $data['album_id'] = $album->id;
         $data['artist_id'] = $artist->id;
         $this->song = Song::updateOrCreate(['id' => $this->fileHash], $data);

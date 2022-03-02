@@ -27,6 +27,7 @@ class MediaSyncService
     public const APPLICABLE_TAGS = [
         'artist',
         'album',
+        'albumartist',
         'title',
         'length',
         'track',
