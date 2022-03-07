@@ -95,6 +95,7 @@
         "analyze": "phpstan analyse --memory-limit 1G --configuration phpstan.neon.dist --ansi"
     },
     "config": {
+        "process-timeout": 1200,
         "preferred-install": "dist",
         "optimize-autoloader": true,
         "allow-plugins": {

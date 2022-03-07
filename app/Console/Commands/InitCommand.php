@@ -63,19 +63,32 @@ class InitCommand extends Command
             $this->info('Running in no-interaction mode');
         }
 
-        try {
-            $this->maybeGenerateAppKey();
-            $this->maybeSetUpDatabase();
-            $this->migrateDatabase();
-            $this->maybeSeedDatabase();
-            $this->maybeSetMediaPath();
-            $this->maybeCompileFrontEndAssets();
-        } catch (Throwable $e) {
-            $this->error("Oops! Koel installation or upgrade didn't finish successfully.");
-            $this->error('Please try again, or visit ' . config('koel.misc.docs_url') . ' for manual installation.');
-            $this->error('😥 Sorry for this. You deserve better.');
+        if ($this->isBuildAssetsOnly()) {
+            try {
+                $this->maybeCompileFrontEndAssets();
+            } catch (Throwable $e) {
+                $this->error("Oops! Koel installation or upgrade didn't finish successfully.");
+                $this->error('Please try again, or visit ' . config('koel.misc.docs_url') . ' for manual installation.');
+                $this->error('😥 Sorry for this. You deserve better.');
 
-            return;
+                return;
+            }
+        } else {
+
+            try {
+                $this->maybeGenerateAppKey();
+                $this->maybeSetUpDatabase();
+                $this->migrateDatabase();
+                $this->maybeSeedDatabase();
+                $this->maybeSetMediaPath();
+                $this->maybeCompileFrontEndAssets();
+            } catch (Throwable $e) {
+                $this->error("Oops! Koel installation or upgrade didn't finish successfully.");
+                $this->error('Please try again, or visit ' . config('koel.misc.docs_url') . ' for manual installation.');
+                $this->error('😥 Sorry for this. You deserve better.');
+
+                return;
+            }
         }
 
         $this->comment(PHP_EOL . '🎆  Success! Koel can now be run from localhost with `php artisan serve`.');
@@ -93,8 +106,8 @@ class InitCommand extends Command
         $this->comment('Again, visit 📙 ' . config('koel.misc.docs_url') . ' for the official documentation.');
         $this->comment(
             "Feeling generous and want to support Koel's development? Check out "
-            . config('koel.misc.sponsor_github_url')
-            . ' 🤗'
+                . config('koel.misc.sponsor_github_url')
+                . ' 🤗'
         );
         $this->comment('Thanks for using Koel. You rock! 🤘');
     }
@@ -326,5 +339,10 @@ class InitCommand extends Command
                 $this->warn(sprintf('The path %s does not exist or not readable. Skipping.', $path));
             }
         });
+    }
+
+    private function isBuildAssetsOnly(): bool
+    {
+        return (bool) $this->option('only-assets');
     }
 }
