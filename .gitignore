@@ -84,3 +84,6 @@ coverage.xml
 log.json
 
 .php_cs.cache
+
+# pwa
+public/manifest.json
