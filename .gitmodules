@@ -1,3 +1,5 @@
 [submodule "resources/assets"]
 	path = resources/assets
 	url = https://github.com/Dumble009/core.git
+	branch = master
+	update = rebase
