@@ -24,6 +24,7 @@ class ArtistRepository extends AbstractRepository
             ->pluck('artist_id')
             ->toArray();
 
-        return array_unique($albumArtists + $songArtists);
+        // return array_unique($albumArtists + $songArtists);
+        return array_unique(array_merge($albumArtists, $songArtists));
     }
 }
